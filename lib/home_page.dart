@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_todo/colors.dart';
+import 'package:flutter_todo/todo.dart';
+import 'package:flutter_todo/todo_view_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -30,7 +32,7 @@ class _HomePageState extends State<HomePage> {
               backgroundColor: secondaryColor,
               builder: (context) {
                 return SizedBox(
-                  height: 120,
+                  height: 128,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -40,13 +42,15 @@ class _HomePageState extends State<HomePage> {
                         'Dodaj notatkę',
                         Icons.add,
                         () {
-                          //TODO add note
+                          Navigator.pop(context);
+                          addTodo();
                         },
                       ),
                       bottomSheetButton(
                         'Wyczyść notatki',
                         Icons.delete,
                         () {
+                          Navigator.pop(context);
                           //TODO clear all notes
                         },
                       ),
@@ -76,7 +80,7 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: primaryColorAccent,
         tooltip: 'Dodaj notatkę',
         onPressed: () {
-          //TODO add note
+          addTodo();
         },
         child: const Icon(
           Icons.add,
@@ -84,6 +88,12 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  addTodo() async {
+    Todo todo = Todo('', '', false, DateTime.now());
+    Todo? todoToReturn = await Navigator.push(context,
+        MaterialPageRoute(builder: (context) => TodoViewPage(todo: todo)));
   }
 
   Widget bottomSheetButton(String title, IconData icon, VoidCallback onTap) {

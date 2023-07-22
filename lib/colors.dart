@@ -8,3 +8,5 @@ const Color secondaryColorAccent = Color(0xFF30574A);
 
 const Color primaryTextColor = Color(0xFF343438);
 const Color secondaryTextColor = Color(0xFFBABABC);
+
+const Color errorColor = Color(0xFFA64A43);
