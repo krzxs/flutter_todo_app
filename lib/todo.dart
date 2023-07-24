@@ -5,4 +5,8 @@ class Todo {
   DateTime dateCreated;
 
   Todo(this.title, this.description, this.isDone, this.dateCreated);
+
+  changeState() {
+    isDone = !isDone;
+  }
 }
