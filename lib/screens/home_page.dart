@@ -157,7 +157,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   //Wypełniona lista notatek
-  Widget tasksList() {
+  tasksList() {
     return ListView.separated(
       padding: const EdgeInsets.symmetric(vertical: 12.0),
       scrollDirection: Axis.vertical,
@@ -360,7 +360,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   //Separator między notatkami
-  Widget tasksSeparator() {
+  tasksSeparator() {
     return const Divider(
       color: secondaryTextColor,
       height: 1.0,
