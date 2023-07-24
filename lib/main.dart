@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_todo/home_page.dart';
 
-void main() {
+void main() async {
   runApp(const MyApp());
 }
 

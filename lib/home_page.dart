@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_todo/colors.dart';
 import 'package:flutter_todo/todo.dart';
 import 'package:flutter_todo/todo_view_page.dart';
@@ -63,6 +62,7 @@ class _HomePageState extends State<HomePage> {
             color: primaryTextColor,
           ),
           onPressed: () {
+            //Menu na dole
             showModalBottomSheet(
               context: context,
               shape: const RoundedRectangleBorder(
@@ -91,8 +91,11 @@ class _HomePageState extends State<HomePage> {
                         'Wyczyść notatki',
                         Icons.delete,
                         () {
+                          setState(() {
+                            todoList.clear();
+                          });
+                          //TODO save todos
                           Navigator.pop(context);
-                          //TODO clear all notes
                         },
                       ),
                     ],
@@ -138,7 +141,8 @@ class _HomePageState extends State<HomePage> {
 
   //TODO save todos
 
-  Widget bottomSheetButton(String title, IconData icon, VoidCallback onTap) {
+  //Przyciski w dolnym menu
+  bottomSheetButton(String title, IconData icon, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
       child: ListTile(
@@ -156,13 +160,14 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget emptyList() {
+  //Pusta lista notatek
+  emptyList() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SvgPicture.asset(
-            'empty_list.svg',
+          Image.asset(
+            'empty_list.png',
             height: 256,
           ),
           const SizedBox(
@@ -189,6 +194,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  //Wypełniona lista notatek
   Widget tasksList() {
     return ListView.separated(
       padding: const EdgeInsets.symmetric(vertical: 12.0),
@@ -196,6 +202,7 @@ class _HomePageState extends State<HomePage> {
       itemCount: todoList.length,
       itemBuilder: (BuildContext context, int index) {
         final todo = todoList[index] as Todo;
+        //Gesty przesuwania
         return Dismissible(
           key: UniqueKey(),
           background: Padding(
@@ -262,7 +269,7 @@ class _HomePageState extends State<HomePage> {
             }
             return true;
           },
-          child: taskCard(todo),
+          child: taskCard(todo, index),
         );
       },
       separatorBuilder: (BuildContext context, int index) {
@@ -271,60 +278,138 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  //TODO on press card menu
-  Widget taskCard(Todo todo) {
+  //Card notatki
+  taskCard(Todo todo, int index) {
     return Card(
       color: primaryColor,
       elevation: 0.0,
       shape: const LinearBorder(),
-      child: ListTile(
-        title: Text(
-          todo.title,
-          style: TextStyle(
-            color: !todo.isDone ? primaryTextColor : secondaryTextColor,
-            decoration:
-                todo.isDone ? TextDecoration.lineThrough : TextDecoration.none,
-            decorationColor: secondaryColorAccent,
-            fontWeight: FontWeight.bold,
+      child: InkWell(
+        onTapUp: (tap) async {
+          //Menu po przyciśnięciu
+          await showMenu(
+            color: secondaryColor,
+            context: context,
+            position: RelativeRect.fromLTRB(
+              tap.globalPosition.dx,
+              tap.globalPosition.dy,
+              tap.globalPosition.dx,
+              tap.globalPosition.dy,
+            ),
+            items: [
+              popupMenuButton(
+                todo.isDone
+                    ? 'Oznacz jako niewykonane'
+                    : 'Oznacz jako wykonane',
+                todo.isDone ? Icons.close : Icons.check,
+                () {
+                  setState(() {
+                    todoList[index].changeState();
+                  });
+                },
+              ),
+              popupMenuButton(
+                'Usuń notatkę',
+                Icons.delete,
+                () {
+                  setState(() {
+                    todoList.removeAt(index);
+                  });
+                },
+              ),
+              popupMenuButton(
+                'Edytuj notatkę',
+                Icons.edit,
+                () {
+                  //TODO edit note
+                },
+              ),
+            ],
+            elevation: 2.0,
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: 4.0,
           ),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              todo.description,
+          child: ListTile(
+            title: Text(
+              todo.title,
               style: TextStyle(
                 color: !todo.isDone ? primaryTextColor : secondaryTextColor,
                 decoration: todo.isDone
                     ? TextDecoration.lineThrough
                     : TextDecoration.none,
                 decorationColor: secondaryColorAccent,
-              ),
-              textAlign: TextAlign.justify,
-            ),
-            const SizedBox(
-              height: 8.0,
-            ),
-            Text(
-              'Utworzono: ${(DateFormat('HH:mm dd.MM.yyyy').format(todo.dateCreated))}',
-              style: TextStyle(
-                color: secondaryTextColor,
-                decoration: todo.isDone
-                    ? TextDecoration.lineThrough
-                    : TextDecoration.none,
-                decorationColor: secondaryColorAccent,
-                fontSize: 12.0,
+                fontWeight: FontWeight.bold,
               ),
             ),
-          ],
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  todo.description,
+                  style: TextStyle(
+                    color: !todo.isDone ? primaryTextColor : secondaryTextColor,
+                    decoration: todo.isDone
+                        ? TextDecoration.lineThrough
+                        : TextDecoration.none,
+                    decorationColor: secondaryColorAccent,
+                  ),
+                  textAlign: TextAlign.justify,
+                ),
+                const SizedBox(
+                  height: 8.0,
+                ),
+                Text(
+                  'Utworzono: ${(DateFormat('HH:mm dd.MM.yyyy').format(todo.dateCreated))}',
+                  style: TextStyle(
+                    color: secondaryTextColor,
+                    decoration: todo.isDone
+                        ? TextDecoration.lineThrough
+                        : TextDecoration.none,
+                    decorationColor: secondaryColorAccent,
+                    fontSize: 12.0,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
 
+  //Item z menu po przyciśnięciu
+  PopupMenuItem popupMenuButton(
+      String label, IconData icon, VoidCallback onTap) {
+    return PopupMenuItem<String>(
+      onTap: onTap,
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            color: primaryTextColor,
+          ),
+          const SizedBox(
+            width: 16,
+          ),
+          Text(
+            label,
+            style: const TextStyle(
+              color: primaryTextColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  //Separator między notatkami
   Widget tasksSeparator() {
     return const Divider(
       color: secondaryTextColor,
+      height: 1.0,
     );
   }
 }

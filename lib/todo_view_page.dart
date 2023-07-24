@@ -97,7 +97,8 @@ class _TodoViewPageState extends State<TodoViewPage> {
     );
   }
 
-  Widget textFormField(String label, TextEditingController controller,
+  //Pola - input
+  textFormField(String label, TextEditingController controller,
       int maxLines, int maxLength) {
     return TextFormField(
       controller: controller,
