@@ -12,44 +12,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List todoList = [
-    Todo(
-      'Test - false',
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus enim ex, tincidunt non ligula nec, posuere.',
-      false,
-      DateTime.now(),
-    ),
-    Todo(
-      'Test - true',
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus enim ex, tincidunt non ligula nec, posuere.',
-      true,
-      DateTime.now(),
-    ),
-    Todo(
-      'Test - true',
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus enim ex, tincidunt non ligula nec, posuere.',
-      true,
-      DateTime.now(),
-    ),
-    Todo(
-      'Test - true',
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus enim ex, tincidunt non ligula nec, posuere.',
-      true,
-      DateTime.now(),
-    ),
-    Todo(
-      'Test - true',
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus enim ex, tincidunt non ligula nec, posuere.',
-      true,
-      DateTime.now(),
-    ),
-    Todo(
-      'Test - true',
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus enim ex, tincidunt non ligula nec, posuere.',
-      true,
-      DateTime.now(),
-    ),
-  ];
+  List todoList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -91,11 +54,8 @@ class _HomePageState extends State<HomePage> {
                         'Wyczyść notatki',
                         Icons.delete,
                         () {
-                          setState(() {
-                            todoList.clear();
-                          });
-                          //TODO save todos
                           Navigator.pop(context);
+                          clearTodos();
                         },
                       ),
                     ],
@@ -131,15 +91,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
-  addTodo() async {
-    Todo todo = Todo('', '', false, DateTime.now());
-    Todo? todoToReturn = await Navigator.push(context,
-        MaterialPageRoute(builder: (context) => TodoViewPage(todo: todo)));
-    //TODO add todo
-  }
-
-  //TODO save todos
 
   //Przyciski w dolnym menu
   bottomSheetButton(String title, IconData icon, VoidCallback onTap) {
@@ -255,16 +206,12 @@ class _HomePageState extends State<HomePage> {
           ),
           onDismissed: (direction) {
             if (direction == DismissDirection.endToStart) {
-              setState(() {
-                todoList.removeAt(index);
-              });
+              removeTodo(index);
             }
           },
           confirmDismiss: (direction) async {
             if (direction == DismissDirection.startToEnd) {
-              setState(() {
-                todoList[index].changeState();
-              });
+              changeTodoState(index);
               return false;
             }
             return true;
@@ -303,25 +250,21 @@ class _HomePageState extends State<HomePage> {
                     : 'Oznacz jako wykonane',
                 todo.isDone ? Icons.close : Icons.check,
                 () {
-                  setState(() {
-                    todoList[index].changeState();
-                  });
+                  changeTodoState(index);
                 },
               ),
               popupMenuButton(
                 'Usuń notatkę',
                 Icons.delete,
                 () {
-                  setState(() {
-                    todoList.removeAt(index);
-                  });
+                  removeTodo(index);
                 },
               ),
               popupMenuButton(
                 'Edytuj notatkę',
                 Icons.edit,
-                () {
-                  //TODO edit note
+                () async {
+                  editTodo(index);
                 },
               ),
             ],
@@ -412,4 +355,53 @@ class _HomePageState extends State<HomePage> {
       height: 1.0,
     );
   }
+
+  addTodo() async {
+    Todo todo = Todo('', '', false, DateTime.now());
+    Todo? todoToReturn = await Navigator.push(context,
+        MaterialPageRoute(builder: (context) => TodoViewPage(todo: todo)));
+    if (todoToReturn != null) {
+      setState(() {
+        todoList.add(todoToReturn);
+      });
+      //TODO save todos
+    }
+  }
+
+  editTodo(int index) async {
+    Todo todo = todoList[index];
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      Todo? todoToReturn = await Navigator.push(context,
+          MaterialPageRoute(builder: (context) => TodoViewPage(todo: todo)));
+      if (todoToReturn != null) {
+        setState(() {
+          todoList[index] = todoToReturn;
+        });
+        //TODO save todos
+      }
+    });
+  }
+
+  removeTodo(int index) {
+    setState(() {
+      todoList.removeAt(index);
+    });
+    //TODO save todos
+  }
+
+  changeTodoState(int index) {
+    setState(() {
+      todoList[index].changeState();
+    });
+    //TODO save todos
+  }
+
+  clearTodos() {
+    setState(() {
+      todoList.clear();
+    });
+    //TODO save todos
+  }
+
+  //TODO save todos method
 }

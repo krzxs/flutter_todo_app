@@ -4,9 +4,9 @@ import 'package:flutter_todo/todo.dart';
 import 'colors.dart';
 
 class TodoViewPage extends StatefulWidget {
-  final Todo? todo;
+  final Todo todo;
 
-  const TodoViewPage({Key? key, this.todo}) : super(key: key);
+  const TodoViewPage({Key? key, required this.todo}) : super(key: key);
 
   @override
   State<TodoViewPage> createState() => _TodoViewPageState();
@@ -17,6 +17,18 @@ class _TodoViewPageState extends State<TodoViewPage> {
   TextEditingController descriptionController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
+
+  late Todo todo;
+
+  @override
+  void initState() {
+    super.initState();
+    todo = widget.todo;
+    if(todo.title.isNotEmpty && todo.description.isNotEmpty) {
+      titleController.text = todo.title;
+      descriptionController.text = todo.description;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +88,9 @@ class _TodoViewPageState extends State<TodoViewPage> {
         child: InkWell(
           onTap: () {
             if (_formKey.currentState!.validate()) {
-              //TODO save note
+              todo.title = titleController.text;
+              todo.description = descriptionController.text;
+              Navigator.pop(context, todo);
             }
           },
           child: const SizedBox(
