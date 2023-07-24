@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_todo/colors.dart';
-import 'package:flutter_todo/todo.dart';
-import 'package:flutter_todo/todo_view_page.dart';
+import 'package:flutter_todo/constants/colors.dart';
+import 'package:flutter_todo/models/todo.dart';
+import 'package:flutter_todo/screens/todo_view_page.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -12,7 +15,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late SharedPreferences pref;
+
   List todoList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    setupTodos();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -161,7 +172,7 @@ class _HomePageState extends State<HomePage> {
               horizontal: 48.0,
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Icon(
                   todo.isDone ? Icons.close : Icons.check,
@@ -364,7 +375,7 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         todoList.add(todoToReturn);
       });
-      //TODO save todos
+      saveTodos();
     }
   }
 
@@ -377,7 +388,7 @@ class _HomePageState extends State<HomePage> {
         setState(() {
           todoList[index] = todoToReturn;
         });
-        //TODO save todos
+        saveTodos();
       }
     });
   }
@@ -386,22 +397,37 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       todoList.removeAt(index);
     });
-    //TODO save todos
+    saveTodos();
   }
 
   changeTodoState(int index) {
     setState(() {
       todoList[index].changeState();
     });
-    //TODO save todos
+    saveTodos();
   }
 
   clearTodos() {
     setState(() {
       todoList.clear();
     });
-    //TODO save todos
+    saveTodos();
   }
 
-  //TODO save todos method
+  setupTodos() async {
+    pref = await SharedPreferences.getInstance();
+    if (pref.getString('todo') != null) {
+      List jsonTodos = jsonDecode(pref.getString('todo')!);
+      for (var todo in jsonTodos) {
+        setState(() {
+          todoList.add(fromJson(todo));
+        });
+      }
+    }
+  }
+
+  saveTodos() {
+    List jsonTodos = todoList.map((e) => e.toJson()).toList();
+    pref.setString('todo', jsonEncode(jsonTodos));
+  }
 }

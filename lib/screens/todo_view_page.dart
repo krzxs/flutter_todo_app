@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_todo/todo.dart';
+import 'package:flutter_todo/models/todo.dart';
 
-import 'colors.dart';
+import '../constants/colors.dart';
 
 class TodoViewPage extends StatefulWidget {
   final Todo todo;
@@ -24,7 +24,7 @@ class _TodoViewPageState extends State<TodoViewPage> {
   void initState() {
     super.initState();
     todo = widget.todo;
-    if(todo.title.isNotEmpty && todo.description.isNotEmpty) {
+    if (todo.title.isNotEmpty && todo.description.isNotEmpty) {
       titleController.text = todo.title;
       descriptionController.text = todo.description;
     }
@@ -112,8 +112,8 @@ class _TodoViewPageState extends State<TodoViewPage> {
   }
 
   //Pola - input
-  textFormField(String label, TextEditingController controller,
-      int maxLines, int maxLength) {
+  textFormField(String label, TextEditingController controller, int maxLines,
+      int maxLength) {
     return TextFormField(
       controller: controller,
       cursorColor: secondaryTextColor,

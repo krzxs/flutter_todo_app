@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_todo/home_page.dart';
+import 'package:flutter_todo/screens/home_page.dart';
 
 void main() async {
   runApp(const MyApp());
@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'ToDo App',
       theme: ThemeData(
+        fontFamily: 'NotoSans',
         useMaterial3: true,
       ),
       home: const HomePage(),
