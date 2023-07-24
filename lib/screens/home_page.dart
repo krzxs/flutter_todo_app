@@ -129,7 +129,7 @@ class _HomePageState extends State<HomePage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Image.asset(
-            'empty_list.png',
+            'assets/empty_list.png',
             height: 256,
           ),
           const SizedBox(
